@@ -5,7 +5,11 @@ import { ProjectTable } from "@/components/ProjectTable";
 const SKIP_AUTH = process.env.SKIP_AUTH === "1";
 const MOCK_EMAIL = "jaejun.lee@krafton.com";
 
-export default async function ProjectsPage() {
+export default async function ProjectsPage({
+  searchParams,
+}: {
+  searchParams: { tenant?: string };
+}) {
   let userEmail = MOCK_EMAIL;
   let admin = true;
 
@@ -15,10 +19,10 @@ export default async function ProjectsPage() {
     admin = await checkIsAdmin(userEmail);
   }
 
-  const projects = await getProjects(userEmail, admin);
+  const projects = await getProjects(userEmail, admin, searchParams.tenant);
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
+    <div className="p-8 max-w-5xl mx-auto">
       <h1 className="text-2xl font-semibold mb-6">Projects</h1>
       <ProjectTable projects={projects} />
     </div>

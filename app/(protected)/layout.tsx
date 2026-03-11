@@ -1,4 +1,4 @@
-import { Header } from "@/components/Header";
+import { Sidebar } from "@/components/Sidebar";
 
 export default function ProtectedLayout({
   children,
@@ -6,9 +6,9 @@ export default function ProtectedLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1">{children}</main>
+    <div className="min-h-screen flex">
+      <Sidebar />
+      <main className="flex-1 overflow-auto">{children}</main>
     </div>
   );
 }

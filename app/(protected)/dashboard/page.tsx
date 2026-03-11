@@ -17,7 +17,11 @@ function deploymentStatusVariant(status: string): "default" | "secondary" | "des
   }
 }
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: { tenant?: string };
+}) {
   let userEmail = MOCK_EMAIL;
   let admin = true;
 
@@ -27,9 +31,11 @@ export default async function DashboardPage() {
     admin = await checkIsAdmin(userEmail);
   }
 
+  const tenant = searchParams.tenant;
+
   const [projects, recentDeployments] = await Promise.all([
-    getProjects(userEmail, admin),
-    getRecentDeployments(userEmail, admin, 5),
+    getProjects(userEmail, admin, tenant),
+    getRecentDeployments(userEmail, admin, 5, tenant),
   ]);
 
   const total = projects.length;
@@ -37,10 +43,9 @@ export default async function DashboardPage() {
   const activeProjects = projects.filter((p) => p.status === "active").slice(0, 5);
 
   return (
-    <div className="p-8 max-w-6xl mx-auto space-y-8">
+    <div className="p-8 max-w-5xl mx-auto space-y-8">
       <h1 className="text-2xl font-semibold">Dashboard</h1>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="pb-2">
@@ -69,7 +74,6 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Deployments */}
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Recent Deployments</CardTitle>
@@ -98,7 +102,6 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Active Projects */}
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Active Projects</CardTitle>
