@@ -27,7 +27,7 @@ export default async function AuditLogPage() {
 
   const { data: logs } = await supabase
     .from("audit_logs")
-    .select("id,actor_email,action,resource_type,resource_id,created_at")
+    .select("id,actor_email,action,resource_id,details,created_at")
     .order("created_at", { ascending: false })
     .limit(100);
 
@@ -39,8 +39,8 @@ export default async function AuditLogPage() {
           <TableRow>
             <TableHead>Actor</TableHead>
             <TableHead>Action</TableHead>
-            <TableHead>Resource</TableHead>
-            <TableHead>ID</TableHead>
+            <TableHead>Resource ID</TableHead>
+            <TableHead>Details</TableHead>
             <TableHead>Time</TableHead>
           </TableRow>
         </TableHeader>
@@ -58,9 +58,11 @@ export default async function AuditLogPage() {
                 <TableCell className="text-sm">
                   <code className="bg-muted px-1.5 py-0.5 rounded text-xs">{l.action}</code>
                 </TableCell>
-                <TableCell className="text-sm text-muted-foreground">{l.resource_type}</TableCell>
                 <TableCell className="text-xs text-muted-foreground font-mono truncate max-w-[120px]">
-                  {l.resource_id}
+                  {l.resource_id ?? "—"}
+                </TableCell>
+                <TableCell className="text-xs text-muted-foreground max-w-[180px] truncate">
+                  {l.details ? JSON.stringify(l.details) : "—"}
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
                   {new Date(l.created_at).toLocaleString()}
