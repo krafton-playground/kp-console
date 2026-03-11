@@ -1,7 +1,12 @@
 import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-export default auth((req) => {
+function middleware(req: NextRequest) {
+  return NextResponse.next();
+}
+
+const authMiddleware = auth((req) => {
   const isLoggedIn = !!req.auth;
   const isAuthRoute = req.nextUrl.pathname.startsWith("/auth");
   const isApiRoute = req.nextUrl.pathname.startsWith("/api");
@@ -18,6 +23,8 @@ export default auth((req) => {
 
   return NextResponse.next();
 });
+
+export default process.env.SKIP_AUTH === "1" ? middleware : authMiddleware;
 
 export const config = {
   matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
