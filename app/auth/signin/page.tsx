@@ -2,7 +2,13 @@ import { signIn } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default function SignInPage() {
+export default function SignInPage({
+  searchParams,
+}: {
+  searchParams: { callbackUrl?: string };
+}) {
+  const callbackUrl = searchParams.callbackUrl ?? "/dashboard";
+
   return (
     <div className="min-h-screen flex items-center justify-center">
       <Card className="w-full max-w-sm">
@@ -13,7 +19,7 @@ export default function SignInPage() {
           <form
             action={async () => {
               "use server";
-              await signIn("microsoft-entra-id");
+              await signIn("microsoft-entra-id", { redirectTo: callbackUrl });
             }}
           >
             <Button type="submit" className="w-full">

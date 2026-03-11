@@ -11,9 +11,14 @@ const authMiddleware = auth((req) => {
   const isAuthRoute = req.nextUrl.pathname.startsWith("/auth");
   const isApiRoute = req.nextUrl.pathname.startsWith("/api");
 
-  if (isAuthRoute || isApiRoute) {
-    return NextResponse.next();
+  if (isApiRoute) return NextResponse.next();
+
+  // Redirect authenticated users away from sign-in page
+  if (isLoggedIn && isAuthRoute) {
+    return NextResponse.redirect(new URL("/dashboard", req.nextUrl.origin));
   }
+
+  if (isAuthRoute) return NextResponse.next();
 
   if (!isLoggedIn) {
     const signInUrl = new URL("/auth/signin", req.nextUrl.origin);

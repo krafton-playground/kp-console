@@ -20,6 +20,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       session.accessToken = token.accessToken as string | undefined;
       return session;
     },
+    async redirect({ url, baseUrl }) {
+      // After sign-in, go to callbackUrl if relative, otherwise /dashboard
+      if (url.startsWith("/")) return url;
+      if (url.startsWith(baseUrl)) return url;
+      return `${baseUrl}/dashboard`;
+    },
   },
   pages: {
     signIn: "/auth/signin",

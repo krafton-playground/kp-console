@@ -72,7 +72,7 @@ export async function getRecentDeployments(
 
   const { data, error } = await query;
   if (error) throw new Error(error.message);
-  return (data ?? []) as Deployment[];
+  return (data ?? []) as unknown as Deployment[];
 }
 
 export async function isAdmin(userEmail: string): Promise<boolean> {
