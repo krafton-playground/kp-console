@@ -5,6 +5,14 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
+export interface ProjectFeatures {
+  hosting?: string | null;
+  database?: string | null;
+  sso?: boolean;
+  custom_domain?: string | null;
+  [key: string]: unknown;
+}
+
 export interface Project {
   id: string;
   name: string;
@@ -14,6 +22,7 @@ export interface Project {
   owner_email: string;
   github_repo: string | null;
   status: string;
+  features?: ProjectFeatures | null;
   created_at: string;
   updated_at: string;
 }
@@ -81,6 +90,34 @@ export async function getRecentDeployments(
   const { data, error } = await query;
   if (error) throw new Error(error.message);
   return (data ?? []) as unknown as Deployment[];
+}
+
+export async function getProject(
+  projectName: string,
+  userEmail: string,
+  admin: boolean,
+): Promise<Project | null> {
+  // Try with features column first; fall back if column doesn't exist yet
+  let result = await supabase
+    .from("projects")
+    .select("id,name,display_name,description,template,owner_email,github_repo,status,features,created_at,updated_at")
+    .eq("name", projectName)
+    .is("deleted_at", null)
+    .single();
+
+  if (result.error?.message?.includes("features")) {
+    result = await supabase
+      .from("projects")
+      .select("id,name,display_name,description,template,owner_email,github_repo,status,created_at,updated_at")
+      .eq("name", projectName)
+      .is("deleted_at", null)
+      .single();
+  }
+
+  if (result.error || !result.data) return null;
+  const data = result.data as Record<string, unknown>;
+  if (!admin && data.owner_email !== userEmail) return null;
+  return { ...data, features: (data.features as ProjectFeatures | null) ?? null } as Project;
 }
 
 export async function isAdmin(userEmail: string): Promise<boolean> {

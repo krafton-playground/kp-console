@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   Table,
   TableBody,
@@ -47,12 +48,14 @@ export function ProjectTable({ projects }: ProjectTableProps) {
           projects.map((project) => (
             <TableRow key={project.id}>
               <TableCell className="font-medium">
-                <div>
-                  <p>{project.display_name ?? project.name}</p>
-                  {project.display_name && (
-                    <p className="text-xs text-muted-foreground">{project.name}</p>
-                  )}
-                </div>
+                <Link href={`/projects/${project.name}`} className="hover:underline">
+                  <div>
+                    <p>{project.display_name ?? project.name}</p>
+                    {project.display_name && (
+                      <p className="text-xs text-muted-foreground">{project.name}</p>
+                    )}
+                  </div>
+                </Link>
               </TableCell>
               <TableCell className="text-muted-foreground text-sm">{project.template}</TableCell>
               <TableCell>
